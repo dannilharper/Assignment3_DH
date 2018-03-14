@@ -64,9 +64,10 @@ wet.weight2 <- wet.weight - mean(wet.weight) ## how different they are from the 
 HOW DO I COME UP WITH THE beta.vec
 ```{r}
 Xmat <- model.matrix(~zone * wet.weight2)
-beta.vec <- c(-2, 1, 2, 5, -2, -7)
+beta.vec <- c(250, 360, 100, 6, 3, 4)
 ```
 
+Why NAs produced? Because the beta vector doesn't make any sense??
 ```{r}
 lin.pred <- Xmat[,] %*% beta.vec
 lambda <- exp(lin.pred) ## poisson mean
@@ -77,6 +78,8 @@ C <- rpois(n = n, lambda = lambda)
 mod1 <- glm(C ~ zone * wet.weight2, poisson)
 summary(mod1)
 ```
+
+Clearly these residual plots are not right...
 ```{r}
 par(mfrow=c(2, 2))
 plot(mod1)
