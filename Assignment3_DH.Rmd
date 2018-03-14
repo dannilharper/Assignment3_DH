@@ -1,0 +1,89 @@
+---
+title: "Assignment3_DH"
+author: "Danni Harper"
+date: "March 13, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+ngroups <- 3  ## number of zones
+nsample <- 20  ## number of sea cucumbers sampled
+zone.means <- c(320, 285, 375)  ## average wet weight (g)
+resid.sd <- 5
+```
+
+```{r}
+n <- ngroups * nsample  ## total number of data points
+eps <- rnorm(n, 0, resid.sd)  ## residuals
+x <- rep(1:3, rep(nsample, ngroups))  ## indicator for each zone
+means <- rep(zone.means, rep(nsample, ngroups))
+```
+
+```{r}
+X <- as.matrix(model.matrix(~as.factor(x) - 1))  ## design matrix; no intercept!
+
+y <- as.numeric(X %*% as.matrix(zone.means) + eps)
+```
+
+```{r}
+
+seacuc.df <- data.frame(population = as.factor(x), ww = y)
+```
+
+```{r}
+p <- ggplot(data = seacuc.df, aes(population, ww))
+p + geom_violin()
+
+```
+
+```{r}
+n.groups <- 3
+n.sample <- 20
+n <- n.groups * n.sample
+```
+
+```{r}
+x <- rep(1:n.groups, rep(n.sample, n.groups)) ## zone indicator
+zone <- factor(x, labels = c("Zone 1", "Zone 2", "Zone 3"))
+```
+
+```{r}
+wet.weight <- runif(n, 250, 410) ## wet weight of sea cucumbers
+wet.weight2 <- wet.weight - mean(wet.weight) ## how different they are from the mean?
+```
+
+
+HOW DO I COME UP WITH THE beta.vec
+```{r}
+Xmat <- model.matrix(~zone * wet.weight2)
+beta.vec <- c(-2, 1, 2, 5, -2, -7)
+```
+
+```{r}
+lin.pred <- Xmat[,] %*% beta.vec
+lambda <- exp(lin.pred) ## poisson mean
+C <- rpois(n = n, lambda = lambda)
+```
+
+```{r}
+mod1 <- glm(C ~ zone * wet.weight2, poisson)
+summary(mod1)
+```
+```{r}
+par(mfrow=c(2, 2))
+plot(mod1)
+```
+
+
+
+
+
+
